@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+
+# Build / package
+*.skill
+*.egg-info/
+build/
+dist/
+
+# Skill-creator workspace
+*-workspace/
+evals/outputs/
+evals/results/
+
+# Test artifacts
+/tmp/test_*
+test_portfolio.*
