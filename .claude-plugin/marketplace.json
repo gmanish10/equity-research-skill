@@ -1,14 +1,17 @@
 {
   "name": "comprehensive-equity-research",
-  "description": "Aggressive-growth equity research plugin for Claude Code, built on the Yahoo Finance MCP",
   "owner": {
     "name": "Manish"
+  },
+  "metadata": {
+    "description": "Aggressive-growth equity research plugin for Claude Code, built on the Yahoo Finance MCP",
+    "version": "0.1.0"
   },
   "plugins": [
     {
       "name": "equity-research",
       "description": "Aggressive-growth equity research and portfolio analysis for US markets (NYSE/NASDAQ). Runs a 7-phase deep-dive framework with mandatory quantified risk callouts on every rating. Handles multi-format portfolio intake (Excel, CSV, screenshots, broker PDFs, typed text) and ships slash commands for research, portfolio review, options flow, ETF analysis, sector briefings, and rebalance plans.",
-      "source": ".",
+      "source": "./",
       "version": "0.1.0"
     }
   ]
