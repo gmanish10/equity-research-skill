@@ -23,17 +23,19 @@ Normalize to `{ ticker, shares, avg_cost?, cost_basis_date?, account?, notes? }`
 
 **Always confirm the parsed portfolio as a table** before analysis. Ask: "Does this look right?"
 
-### Step 1 — Per-position research (tiered; obey SKILL.md token-conservation rules)
+### Step 1 — Progressive-depth research (see SKILL.md for full rules)
 
-- **Tier 1** — top 5 by weight OR any position ≥5%: full 7-phase deep dive
-- **Tier 2** — positions 6–10: `get_ticker_info` + `get_analyst_data(recommendations+price_targets)` + 6mo weekly chart
-- **Tier 3** — tail: single `get_tickers_info` batch call; no per-ticker fetches
+Three-pass escalation — no hard caps on position depth:
 
-Parallelize: pull `get_tickers_info` and `download([all_tickers], 1y, 1wk)` in batch calls, not per-position loops.
+- **Pass A (whole book, 2 batch calls)**: `get_tickers_info([all])` + `download([all, SPY, sectors], 1y, 1wk)`. Pipe `download()` output to `scripts/portfolio_metrics.py`; consume only the summary — do NOT inline raw OHLCV.
+- **Pass B (every position, parallelized)**: `get_analyst_data(recommendations + price_targets)` for all tickers. For positions ≥3% of book, also pull yearly financials, earnings, `eps_trend`, and `institutional + insider_purchases` holders.
+- **Pass C (flagged + top 3, full 7-phase)**: auto-escalate positions that trip any of these flags — broken thesis (price down >20% from avg cost, or 6m return >15% below sector), rich valuation (fwd P/E > 1.5× 5y median), weakening momentum (< 50-DMA + RSI < 45 + 3m negative), net analyst downgrades in last 90d, insider selling > $10M, fresh catalyst in last 30d, any position >10% of book, or explicit user callout. The top 3 positions by weight always auto-escalate.
+
+Parallelize aggressively within each pass. No per-ticker serial loops.
 
 ### Step 2 — Portfolio-level metrics
 
-Run `skills/equity-research/scripts/portfolio_metrics.py`:
+Run `skills/equity-research/scripts/portfolio_metrics.py` against the Pass A `download()` output. Consume only the summary — never hand raw OHLCV to the model. Produces:
 - Weights, sector/geo/mcap breakdown
 - Weighted beta
 - Correlation matrix (from 1y weekly)

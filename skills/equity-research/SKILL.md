@@ -43,16 +43,12 @@ MCP responses are by far the largest token cost of this skill. Obey these defaul
 
 - **`get_price_history`**: default `period="6mo", interval="1d"`. Use `1y` only when a full regression (e.g. beta) is required.
 - **`download([...])`**: default `interval="1wk"` for correlation/beta over 1y (5× smaller than daily). Use `1d` only when daily granularity matters (e.g. 3-month breakout analysis).
-- **`get_analyst_data("upgrades_downgrades")`**: response can be 300 KB of multi-year history. **Always** read from the saved tool-result file and filter to the last 30 days before processing.
+- **`get_analyst_data("upgrades_downgrades")`**: response can be 300 KB of multi-year history. **Always** read from the saved tool-result file and filter to the last **90 days** before processing (you need 90d to see multi-quarter sentiment cycles).
 - **`get_options()`**: call once without date to list expiries, then pull **only the nearest monthly** (and earnings-expiry if within 2 weeks). Filter strikes to ±20% of spot before analysis.
-- **`get_financials`**: default `"yearly"` (5 periods). Add `"quarterly"` only when trend-quarter-over-quarter is the question.
+- **`get_financials`**: default `"yearly"` (5 periods). Add `"quarterly"` only when a quarter-over-quarter trend is the question (earnings-season reviews, margin deceleration checks).
 - **`get_holders`**: pull only `institutional` and `insider_purchases` by default; skip `mutualfund`, `insider_roster`, full `insider_transactions` unless asked.
-- **Portfolio tiers** (non-negotiable for any book ≥ 6 positions):
-  - **Tier 1 (top 5 by weight, or ≥5% positions)**: full 7-phase
-  - **Tier 2 (positions 6–10)**: `get_ticker_info` + `get_analyst_data(recommendations+price_targets)` + 6-month weekly chart
-  - **Tier 3 (tail)**: `get_tickers_info` batch call only — no per-ticker fetches
+- **Never inline raw OHLCV / chain data into context.** `download()`, `get_price_history()`, and `get_options()` responses stay on disk. Pattern: parse the saved JSON → write a temp CSV → pass to `scripts/technicals.py --csv <path>`, `scripts/portfolio_metrics.py`, or `scripts/options_analytics.py`. Consume only the script's summary output. This is the single biggest token saving for portfolio work — a 20-position `download()` dropped to a summary table is ~5k tokens instead of ~200k.
 - **Oversized responses**: when you see "result exceeds maximum allowed tokens. Output has been saved to ...", read from disk and parse — do NOT re-issue with narrower params. Saved file schema: `[{type:"text", text:"<json string>"}]`. Parse outer array, `json.loads` the `text` field, then index into the structured payload.
-- Pattern: parse saved JSON → write temp CSV → pass to `scripts/technicals.py --csv <path>`. Do not Read oversized files inline.
 
 ---
 
@@ -122,16 +118,42 @@ Normalize everything to: `{ ticker, shares, avg_cost?, cost_basis_date?, account
 
 **Always confirm the parsed portfolio as a table before analysis.** Cheap to confirm; expensive to run 50 MCP calls on a misparse. See `references/portfolio-construction.md` for schema and broker-PDF quirks.
 
-### Step 1 — Per-position research
+### Step 1 — Progressive-depth research (no hard tiers)
 
-Apply the **Portfolio tiers** from the token-conservation rules above. Do not deep-dive the full book.
+Do not cap positions at a shallow level just because they rank low. Use a three-pass escalation:
+
+**Pass A — whole book, cheap (always run, 2 batch calls total):**
+- `get_tickers_info([all tickers])` — one batch call for the entire book
+- `download([all tickers, SPY, relevant_sector_etfs], period="1y", interval="1wk")` — one batch call, weekly interval
+- Pipe `download()` output straight to `scripts/portfolio_metrics.py` for correlation matrix, weighted beta, per-ticker vol, drawdown sim. Consume only the script's summary — **do not inline raw OHLCV into context.**
+
+**Pass B — every position (cheap, parallelized):**
+- `get_analyst_data(symbol, "recommendations")` + `get_analyst_data(symbol, "price_targets")` — issue in parallel for all tickers
+- For positions ≥3% of book, also: `get_financials(yearly)`, `get_earnings(quarterly)`, `get_analyst_data("eps_trend")`, `get_holders(institutional + insider_purchases)`
+- This gives every position a fundamentals + analyst + insider read.
+
+**Pass C — flagged positions only (full 7-phase):**
+
+Auto-escalate to the full 7-phase workup for any position that trips one of these flags from Pass A/B:
+- **Broken thesis**: price down >20% from avg cost, or trailing 6m return >15% below its sector ETF
+- **Rich valuation**: forward P/E > 1.5× its 5y median, or P/S > 2× sector median
+- **Weakening momentum**: below 50-DMA AND RSI < 45 AND 3m price trend negative
+- **Analyst sentiment cracking**: net downgrades in last 90d, or consensus price target within 5% of spot
+- **Insider selling**: net insider sales > $10M in last quarter with no offsetting purchases
+- **Fresh catalyst**: earnings guide miss, 8-K material event, management change in last 30d
+- **Concentration**: any position >10% of book (size demands deeper justification)
+- **User called it out**: the user named it specifically ("what about my PLTR?")
+
+Also auto-escalate the **top 3 positions by weight** regardless — they drive portfolio outcome.
+
+Parallelize aggressively within each pass. Do NOT serialize per-ticker loops.
 
 ### Step 2 — Portfolio-level metrics
 
-Use `scripts/portfolio_metrics.py` — do not re-derive. Produces:
+Use `scripts/portfolio_metrics.py` — do not re-derive, do not have the model compute correlation from raw OHLCV in context. Produces:
 - Allocation by position / sector / geo / mcap / factor
 - Concentration flags (position >15%, sector >35%)
-- Correlation matrix from `download([all], 1y, 1wk)`
+- Correlation matrix (from the 1y weekly `download()` saved in Pass A)
 - Weighted beta → -15% / -25% / -40% drawdown sim
 - Factor tilts vs. aggressive-growth benchmark
 - Short interest, liquidity per position
