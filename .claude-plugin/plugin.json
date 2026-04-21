@@ -1,0 +1,17 @@
+{
+  "name": "equity-research",
+  "version": "0.1.0",
+  "description": "Aggressive-growth equity research and portfolio analysis for US markets, built on the Yahoo Finance MCP. Bundles the equity-research skill plus six slash commands (research-stock, analyze-portfolio, options-flow, rebalance-plan, analyze-etf, sector-brief).",
+  "author": {
+    "name": "Manish"
+  },
+  "license": "MIT",
+  "keywords": [
+    "equity-research",
+    "stocks",
+    "portfolio",
+    "options",
+    "yahoo-finance",
+    "aggressive-growth"
+  ]
+}
