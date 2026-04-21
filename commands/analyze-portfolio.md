@@ -11,60 +11,59 @@ Full portfolio review through the aggressive-growth / higher-risk-tolerance lens
 
 ### Step 0 — Intake (always first)
 
-Detect the input format:
-
 | Format | Action |
 |---|---|
-| .xlsx / .csv attachment | Run `python skills/equity-research/scripts/parse_portfolio.py <path>` |
-| Image / screenshot | Read with vision, extract rows |
-| .pdf (broker statement) | Invoke the `pdf` skill to extract tables, then normalize |
-| Typed / pasted text | Parse inline |
-| Nothing provided | Ask the user to share in any of the formats above |
+| .xlsx / .csv | `python skills/equity-research/scripts/parse_portfolio.py <path>` |
+| Image | Read with vision, extract rows |
+| .pdf (broker) | Invoke `pdf` skill, then normalize |
+| Typed / pasted | Parse inline |
+| Nothing | Ask user to share |
 
-**Always confirm the parsed portfolio back as a table** before running any analysis. Ask: "Does this look right?"
+Normalize to `{ ticker, shares, avg_cost?, cost_basis_date?, account?, notes? }`.
 
-Normalize to: `{ ticker, shares, avg_cost?, cost_basis_date?, account?, notes? }`
+**Always confirm the parsed portfolio as a table** before analysis. Ask: "Does this look right?"
 
-### Step 1 — Per-position research
+### Step 1 — Per-position research (tiered; obey SKILL.md token-conservation rules)
 
-- For positions ≥5% of book OR top 10 by weight: run the full 7-phase deep dive
-- For the tail: run a fast version — `get_ticker_info` + `get_analyst_data(recommendations+price_targets)` + 6-month chart
+- **Tier 1** — top 5 by weight OR any position ≥5%: full 7-phase deep dive
+- **Tier 2** — positions 6–10: `get_ticker_info` + `get_analyst_data(recommendations+price_targets)` + 6mo weekly chart
+- **Tier 3** — tail: single `get_tickers_info` batch call; no per-ticker fetches
 
-Parallelize aggressively — pull all `get_tickers_info` and `download([all_tickers])` data in batch calls, not per-position loops.
+Parallelize: pull `get_tickers_info` and `download([all_tickers], 1y, 1wk)` in batch calls, not per-position loops.
 
 ### Step 2 — Portfolio-level metrics
 
-Run `skills/equity-research/scripts/portfolio_metrics.py` with the parsed portfolio to produce:
+Run `skills/equity-research/scripts/portfolio_metrics.py`:
 - Weights, sector/geo/mcap breakdown
 - Weighted beta
-- Correlation matrix
-- Simulated drawdowns at -15%, -25%, -40% market
+- Correlation matrix (from 1y weekly)
+- Simulated drawdowns at -15% / -25% / -40%
 - Factor exposure vs. aggressive-growth benchmark
 
 ### Step 3 — Critical review
 
-See `skills/equity-research/references/portfolio-construction.md` for the review checklist. Identify:
+See `skills/equity-research/references/portfolio-construction.md`. Identify:
 - Broken theses
 - Dead weight
-- Concentration risks AND concentration opportunities (aggressive lens)
-- Gaps that cost upside
+- Concentration risks AND concentration opportunities
+- Gaps costing upside
 
 ### Step 4 — Recommendations
 
 Structured action list:
-- **REDUCE / REMOVE** — per position with reason + quantified risk if kept
-- **KEEP** — per position with restated thesis
-- **ADD** — specific tickers/ETFs with sizing, role, thesis
-- **CONDITIONAL TRIGGERS** — every action gated on price, technical, fundamental, or macro condition
+- **REDUCE / REMOVE** — per position, reason + quantified risk if kept
+- **KEEP** — per position, restated thesis
+- **ADD** — tickers/ETFs with sizing, role, thesis
+- **CONDITIONAL TRIGGERS** — every action gated on price / technical / fundamental / macro
 - **TIMELINE** — immediate / 2–4 weeks / pending catalyst
-- **HEDGES** — if concentration warrants it
+- **HEDGES** — if concentration warrants
 
 Every aggressive suggestion carries a risk callout. See `skills/equity-research/references/risk-frameworks.md`.
 
 ## Deliverable
 
-Default: .docx report saved to `/outputs/` using `skills/equity-research/references/report-templates/portfolio-review.md`. Include a chat summary of the top 3 actions with clear triggers.
+Default: `.docx` in `/outputs/` using `skills/equity-research/references/report-templates/portfolio-review.md`. Chat summary of top 3 actions with triggers.
 
-If the user asks for an artifact ("let me check this weekly"), build an HTML artifact they can re-open.
+If user asks for an artifact ("let me check this weekly"), build an HTML artifact.
 
 ## Mandatory disclaimer in every output.
