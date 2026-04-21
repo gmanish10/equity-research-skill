@@ -1,0 +1,62 @@
+{
+  "skill_name": "equity-research",
+  "notes": "Realistic test prompts covering the skill's main workflows. Use with skill-creator's eval loop. Add `assertions` arrays later once you've seen a baseline run.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "deep-stock-research-nvda",
+      "prompt": "Do a deep research workup on NVDA. I want short/mid/long-term views and want to know what would kill each thesis. I'm aggressive so don't sugarcoat it.",
+      "expected_output": "A .docx equity research report (or structured chat response) covering all 7 phases, culminating in three horizon-specific rating blocks each with a WHAT KILLS THIS TRADE line. Quantitative depth in fundamentals and technicals. MCP-first data sourcing visible in the tool use.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "portfolio-review-from-excel",
+      "prompt": "Here's my portfolio (attached). Review it with an aggressive growth lens and tell me what to do.",
+      "expected_output": "Portfolio parsed and confirmed back as a table. Per-position assessment for top 10 holdings. Concentration, beta, drawdown scenarios. Action matrix with specific triggers and timelines. Every aggressive recommendation paired with a quantified risk callout.",
+      "files": ["portfolio_sample.xlsx"]
+    },
+    {
+      "id": 3,
+      "name": "portfolio-review-from-screenshot",
+      "prompt": "Check this screenshot of my Robinhood holdings. What should I change?",
+      "expected_output": "Portfolio extracted from image via vision. Confirmed back as a table. Full portfolio review with actionable recommendations. Handles the fact that screenshots may be missing cost basis.",
+      "files": ["robinhood_screenshot.png"]
+    },
+    {
+      "id": 4,
+      "name": "etf-analysis-soxx",
+      "prompt": "Is SOXX a good addition for an aggressive growth portfolio? Already own QQQ and some individual semi names.",
+      "expected_output": "One-pager analysis of SOXX. Crucially identifies overlap with QQQ and individual semi holdings — the answer needs to address redundancy, not just 'yes it's good.' Rating block with role fit, conviction, and what kills the trade.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "sector-brief-semiconductors",
+      "prompt": "Give me a sector brief on semiconductors. I want to know the best aggressive bet in the space right now.",
+      "expected_output": "Sector composition, aggregates, regime fit, peer table sorted by composite score, entry vehicle recommendations ranked by conviction and risk, verdict with WHAT KILLS THIS CALL.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "name": "options-flow-tsla",
+      "prompt": "What's the options setup on TSLA look like for next month's expiry?",
+      "expected_output": "IV level + rank, put/call ratios, max pain, magnet strikes, implied move, unusual activity flags. Aggressive-lens suggested play with strike/expiry guidance and a quantified max-loss callout. Explicit options-specific risk warning.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "name": "rebalance-plan-after-review",
+      "prompt": "Based on the portfolio review you just did, give me a concrete rebalancing plan — what to do, when, and at what prices.",
+      "expected_output": "Full action matrix table with Action / Ticker / Size / Trigger / Deadline / Risk columns. Order of operations (sells first, hedges second, buys last). Tax awareness if cost basis was provided. Top-3 plain-English summary at the end.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "name": "quick-stock-check",
+      "prompt": "How's AAPL doing right now?",
+      "expected_output": "Short chat response (5-10 lines), not a full report. Current price, recent move context, near-term catalyst, brief view. Should NOT kick off a full 7-phase deep-dive for a casual question.",
+      "files": []
+    }
+  ]
+}
