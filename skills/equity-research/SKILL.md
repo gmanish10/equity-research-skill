@@ -71,7 +71,7 @@ MCP responses are by far the largest token cost of this skill. Obey these defaul
 Call MCP tools in parallel batches — never sequentially.
 
 - **Batch 1 (core)**: `get_ticker_info(fast=false)`, `get_financials(income/balance/cashflow, yearly)`, `get_price_history(6mo, 1d)`
-- **Batch 2 (analyst + ownership)**: `get_analyst_data(recommendations / price_targets / estimates / eps_trend)`, `get_analyst_data(upgrades_downgrades)` (→ filter to 30d from saved file), `get_holders(institutional + insider_purchases)`, `get_earnings(quarterly)`
+- **Batch 2 (analyst + ownership)**: `get_analyst_data(recommendations / price_targets / estimates / eps_trend)`, `get_analyst_data(upgrades_downgrades)` (→ filter to 90d from saved file), `get_holders(institutional + insider_purchases)`, `get_earnings(quarterly)`
 - **Batch 3 (context)**: `get_ticker_calendar(news)`, `get_options()` → nearest monthly, `download([ticker, SPY, sector_etf], 1y, 1wk)`
 
 ### Phase 7 — verdict (mandatory structure)
