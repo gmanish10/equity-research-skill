@@ -29,7 +29,9 @@ Three-pass escalation — no hard caps on position depth:
 
 - **Pass A (whole book, 2 batch calls)**: `get_tickers_info([all])` + `download([all, SPY, sectors], 1y, 1wk)`. Pipe `download()` output to `scripts/portfolio_metrics.py`; consume only the summary — do NOT inline raw OHLCV.
 - **Pass B (every position, parallelized)**: `get_analyst_data(recommendations + price_targets)` for all tickers. For positions ≥3% of book, also pull yearly financials, earnings, `eps_trend`, and `institutional + insider_purchases` holders.
-- **Pass C (flagged + top 3, full 7-phase)**: auto-escalate positions that trip any of these flags — broken thesis (price down >20% from avg cost, or 6m return >15% below sector), rich valuation (fwd P/E > 1.5× 5y median), weakening momentum (< 50-DMA + RSI < 45 + 3m negative), net analyst downgrades in last 90d, insider selling > $10M, fresh catalyst in last 30d, any position >10% of book, or explicit user callout. The top 3 positions by weight always auto-escalate.
+- **Pass C (flagged + top 5, full 7-phase)**: auto-escalate positions that trip any of these flags — broken thesis (price down >20% from avg cost, or 6m return >15% below sector), rich valuation (fwd P/E > 1.5× 5y median), weakening momentum (< 50-DMA + RSI < 45 + 3m negative), net analyst downgrades in last 90d, insider selling > $10M, fresh catalyst in last 30d, any position >10% of book, or explicit user callout. The top 5 positions by weight always auto-escalate.
+
+Non-Pass-C positions get the **compact 5-line verdict** (see SKILL.md → Phase 7 → "Compact verdict"), not the full 3-horizon template.
 
 Parallelize aggressively within each pass. No per-ticker serial loops.
 
