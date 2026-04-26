@@ -75,6 +75,9 @@ MCP responses are by far the largest token cost of this skill. Obey these defaul
 - **`get_options()`**: call once without date to list expiries, then pull **only the nearest monthly** (and earnings-expiry if within 2 weeks). Filter strikes to ±20% of spot before analysis.
 - **`get_financials`**: default `"yearly"` (5 periods). Add `"quarterly"` only when a quarter-over-quarter trend is the question (earnings-season reviews, margin deceleration checks).
 - **`get_holders`**: pull only `institutional` and `insider_purchases` by default; skip `mutualfund`, `insider_roster`, full `insider_transactions` unless asked.
+- **`get_analyst_data` defaults**: pull only `recommendations`, `price_targets`, and `eps_trend` by default. `estimates` and `growth` overlap with the others and should be added only on Pass C / full deep-dive escalation, not on every position.
+- **`get_ticker_calendar("news")`**: extract headline + date + source + a one-line summary of each item; **drop article bodies** unless an item is flagged as a likely catalyst (earnings beat/miss, guidance change, M&A, regulatory action, management change). Do not retain full article text in context.
+- **`get_ticker_calendar("sec_filings")`**: opt-in only. Pull when there is a fresh 8-K, S-1, 10-Q, or 10-K within the relevant window; otherwise skip. Most decisions don't require reading filings.
 - **Never inline raw OHLCV / chain data into context.** `download()`, `get_price_history()`, and `get_options()` responses stay on disk. Pattern: parse the saved JSON → write a temp CSV → pass to `scripts/technicals.py --csv <path>`, `scripts/portfolio_metrics.py`, or `scripts/options_analytics.py`. Consume only the script's summary output. This is the single biggest token saving for portfolio work — a 20-position `download()` dropped to a summary table is ~5k tokens instead of ~200k.
 - **Oversized responses**: when you see "result exceeds maximum allowed tokens. Output has been saved to ...", read from disk and parse — do NOT re-issue with narrower params. Saved file schema: `[{type:"text", text:"<json string>"}]`. Parse outer array, `json.loads` the `text` field, then index into the structured payload.
 
@@ -84,7 +87,7 @@ MCP responses are by far the largest token cost of this skill. Obey these defaul
 
 | Phase | Goal | Key MCP calls | Reference |
 |---|---|---|---|
-| 1. Business model | What they do, who pays, who they depend on | `get_ticker_info`, `get_ticker_calendar(news, sec_filings)`, `get_dividends_splits` | `references/supply-chain-research.md` |
+| 1. Business model | What they do, who pays, who they depend on | `get_ticker_info`, `get_ticker_calendar(news)` (`sec_filings` only if fresh 8-K/S-1/10-Q/10-K), `get_dividends_splits` | `references/supply-chain-research.md` |
 | 2. Sector context | Where they live, regime fit | `get_industry_data`, `get_sector_data`, `get_tickers_info` (peers) | `references/sector-analysis.md` |
 | 3. Fundamentals | Growth, margins, returns, valuation | `get_financials` (yearly; quarterly if needed), `get_earnings`, `get_analyst_data` | `references/fundamentals.md` |
 | 4. Technicals | Trend, momentum, key levels, computed beta | `get_price_history`, `download(ticker+SPY+sector, 1y weekly)` | `references/technicals.md` |
@@ -99,7 +102,7 @@ MCP responses are by far the largest token cost of this skill. Obey these defaul
 Call MCP tools in parallel batches — never sequentially.
 
 - **Batch 1 (core)**: `get_ticker_info(fast=false)`, `get_financials(income/balance/cashflow, yearly)`, `get_price_history(6mo, 1d)`
-- **Batch 2 (analyst + ownership)**: `get_analyst_data(recommendations / price_targets / estimates / eps_trend)`, `get_analyst_data(upgrades_downgrades)` (→ filter to 90d from saved file), `get_holders(institutional + insider_purchases)`, `get_earnings(quarterly)`
+- **Batch 2 (analyst + ownership)**: `get_analyst_data(recommendations / price_targets / eps_trend)`, `get_analyst_data(upgrades_downgrades)` (→ filter to 90d from saved file), `get_holders(institutional + insider_purchases)`, `get_earnings(quarterly)`. Add `estimates` and `growth` only for Pass C escalations, not by default.
 - **Batch 3 (context)**: `get_ticker_calendar(news)`, `get_options()` → nearest monthly, `download([ticker, SPY, sector_etf], 1y, 1wk)`
 
 ### Phase 7 — verdict (mandatory structure)
@@ -129,6 +132,20 @@ Position sizing: [% of portfolio; must respect the lens's max-single-position ca
 If you cannot articulate what would invalidate the thesis, you do not yet have a thesis.
 
 Full docx structure: `references/report-templates/equity-research-report.md`.
+
+#### Compact verdict (Pass B portfolio positions only)
+
+For positions in a portfolio review that are **not** in Pass C (i.e. not top-5 by weight, not flagged), use this 5-line block instead of the full 3-horizon template. The decision surface is preserved; the prose is collapsed.
+
+```
+Lens:    [aggressive | balanced | conservative]
+Action:  [Add / Keep / Trim / Exit]
+Trigger: [price level / technical / fundamental / macro condition]
+Sizing:  [target % of portfolio; must respect lens cap]
+Kills:   [the one scenario most likely to invalidate, with % loss estimate]
+```
+
+Compact verdicts apply only inside a portfolio review for non-flagged Pass B positions. Single-ticker `/research-stock` calls and Pass C escalations always use the full 3-horizon template.
 
 ---
 
@@ -174,7 +191,7 @@ Auto-escalate to the full 7-phase workup for any position that trips one of thes
 - **Concentration**: any position >10% of book (size demands deeper justification)
 - **User called it out**: the user named it specifically ("what about my PLTR?")
 
-Also auto-escalate the **top 3 positions by weight** regardless — they drive portfolio outcome.
+Also auto-escalate the **top 5 positions by weight** regardless — they drive portfolio outcome.
 
 Parallelize aggressively within each pass. Do NOT serialize per-ticker loops.
 
