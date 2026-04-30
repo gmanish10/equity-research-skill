@@ -12,7 +12,7 @@
     {
       "name": "equity-research",
       "description": "Aggressive-growth equity research and portfolio analysis for US markets (NYSE/NASDAQ). Runs a 7-phase deep-dive framework with mandatory quantified risk callouts on every rating. Handles multi-format portfolio intake (Excel, CSV, screenshots, broker PDFs, typed text) and ships slash commands for research, portfolio review, options flow, ETF analysis, sector briefings, and rebalance plans.",
-      "source": "./",
+      "source": "./plugins/equity-research",
       "version": "0.1.0"
     }
   ]

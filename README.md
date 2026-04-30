@@ -34,10 +34,10 @@ After install, restart Claude Code to pick up the new slash commands.
 
 This repo also includes Codex plugin metadata:
 
-- `.codex-plugin/plugin.json` — plugin manifest
 - `.agents/plugins/marketplace.json` — Codex marketplace manifest
-- `skills/equity-research/SKILL.md` — skill entry point
-- `commands/*.md` — slash-command prompts
+- `plugins/equity-research/.codex-plugin/plugin.json` — plugin manifest
+- `plugins/equity-research/skills/equity-research/SKILL.md` — skill entry point
+- `plugins/equity-research/commands/*.md` — slash-command prompts
 
 Add the marketplace from Codex CLI:
 
@@ -67,7 +67,7 @@ Restart Codex or open a fresh session after enabling the plugin.
 
 ## Install as a standalone skill
 
-If you're not using a plugin-capable client, you can install just the skill (without the slash commands) by packaging or copying `skills/equity-research/` into your client's skill location. In clients that support `.skill` files, use the release asset if one is published.
+If you're not using a plugin-capable client, you can install just the skill (without the slash commands) by packaging or copying `plugins/equity-research/skills/equity-research/` into your client's skill location. In clients that support `.skill` files, use the release asset if one is published.
 
 ## Usage
 
@@ -98,24 +98,26 @@ equity-research-skill/
 |   \-- plugins/
 |       \-- marketplace.json           # Codex marketplace manifest
 |-- .claude-plugin/
-|   |-- marketplace.json               # Plugin marketplace manifest
-|   \-- plugin.json                    # Claude plugin manifest
-|-- .codex-plugin/
-|   \-- plugin.json                    # Codex plugin manifest
-|-- commands/                          # Slash commands (plugin root)
-|   |-- research-stock.md
-|   |-- analyze-portfolio.md
-|   |-- analyze-etf.md
-|   |-- sector-brief.md
-|   |-- options-flow.md
-|   \-- rebalance-plan.md
-|-- skills/
-|   \-- equity-research/               # The skill
-|       |-- SKILL.md                   # Skill entry point
-|       |-- references/                # Deep-dive methodology docs
-|       |   \-- report-templates/      # Deliverable templates
-|       |-- scripts/                   # Python - technicals, ratios, portfolio intake, etc.
-|       \-- evals/                     # Eval test cases
+|   \-- marketplace.json               # Claude Code marketplace manifest
+|-- plugins/
+|   \-- equity-research/               # Plugin root
+|       |-- .claude-plugin/
+|       |   \-- plugin.json            # Claude plugin manifest
+|       |-- .codex-plugin/
+|       |   \-- plugin.json            # Codex plugin manifest
+|       |-- commands/                  # Slash commands
+|       |   |-- research-stock.md
+|       |   |-- analyze-portfolio.md
+|       |   |-- analyze-etf.md
+|       |   |-- sector-brief.md
+|       |   |-- options-flow.md
+|       |   \-- rebalance-plan.md
+|       \-- skills/
+|           \-- equity-research/       # The skill
+|               |-- SKILL.md           # Skill entry point
+|               |-- references/        # Deep-dive methodology docs
+|               |-- scripts/           # Python - technicals, ratios, portfolio intake, etc.
+|               \-- evals/             # Eval test cases
 |-- README.md
 |-- LICENSE
 |-- DISCLAIMER.md
@@ -130,7 +132,7 @@ Built on top of Anthropic's bundled `stock-analyst` skill. The Yahoo Finance MCP
 
 Open an issue or PR. Useful directions:
 
-- Additional broker-statement parsers in `skills/equity-research/scripts/parse_portfolio.py`
+- Additional broker-statement parsers in `plugins/equity-research/skills/equity-research/scripts/parse_portfolio.py`
 - More sophisticated DCF / fair value modeling
 - Backtesting harness for rating accuracy
 - Earnings-call transcript summarization

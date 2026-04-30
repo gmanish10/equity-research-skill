@@ -8,7 +8,7 @@
       "name": "equity-research",
       "source": {
         "source": "local",
-        "path": "./"
+        "path": "./plugins/equity-research"
       },
       "policy": {
         "installation": "AVAILABLE",
