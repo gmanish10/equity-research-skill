@@ -1,0 +1,41 @@
+{
+  "name": "equity-research",
+  "version": "0.1.0",
+  "description": "Aggressive-growth equity research and portfolio analysis for US markets, ETFs, options, sectors, and portfolios.",
+  "author": {
+    "name": "Manish",
+    "url": "https://github.com/gmanish10"
+  },
+  "homepage": "https://github.com/gmanish10/equity-research-skill",
+  "repository": "https://github.com/gmanish10/equity-research-skill",
+  "license": "MIT",
+  "keywords": [
+    "equity-research",
+    "stocks",
+    "portfolio",
+    "options",
+    "etf",
+    "yahoo-finance",
+    "aggressive-growth"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Equity Research",
+    "shortDescription": "Opinionated stock, ETF, options, and portfolio research.",
+    "longDescription": "Aggressive-growth equity research and portfolio analysis with multi-horizon ratings, quantified risk callouts, portfolio intake, ETF analysis, sector briefs, options flow, and rebalance planning.",
+    "developerName": "Manish",
+    "category": "Finance",
+    "capabilities": [
+      "Research",
+      "Analysis",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/gmanish10/equity-research-skill",
+    "defaultPrompt": [
+      "Research NVDA with short, mid, and long-term ratings.",
+      "Review my portfolio with an aggressive-growth lens.",
+      "Analyze the options setup on TSLA."
+    ],
+    "brandColor": "#0F766E"
+  }
+}
