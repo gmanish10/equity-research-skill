@@ -1,8 +1,8 @@
-# Equity Research Skill (Aggressive-Growth Edition)
+# Equity Research Plugin (Aggressive-Growth Edition)
 
 > **Disclaimer — read this first.** This plugin produces opinionated investment analysis for educational and informational purposes only. It is **not personalized financial advice**. Nothing produced by this plugin should be taken as a recommendation to buy, sell, or hold any security. Data is delayed ~15 minutes. Consult a qualified financial advisor before making investment decisions. Past performance does not predict future returns. Options involve substantial risk and can expire worthless. Leveraged ETFs are not long-term investments. You can lose money. Use at your own risk.
 
-A Claude Code plugin for opinionated, aggressive-growth equity research — stocks, options, ETFs, sectors, and full portfolio reviews. Uses the Yahoo Finance MCP for quantitative data and web search for qualitative context.
+A Claude Code and Codex plugin for opinionated, aggressive-growth equity research — stocks, options, ETFs, sectors, and full portfolio reviews. Uses the Yahoo Finance MCP for quantitative data and web search for qualitative context.
 
 ## What it does
 
@@ -19,31 +19,55 @@ This plugin defaults to an **aggressive growth, higher-than-average risk toleran
 
 **But every aggressive recommendation carries a mandatory, quantified risk callout** — a `WHAT KILLS THIS TRADE` block specifying exactly what would invalidate the thesis and how much it would cost. Aggressive != reckless.
 
-## Install (Claude Code plugin marketplace)
+## Install on Claude Code
 
-This repo **is** a Claude Code plugin marketplace. Install it with two commands from inside Claude Code:
+This repo includes Claude Code plugin marketplace metadata. Install it with two commands from inside Claude Code:
 
 ```
-/plugin marketplace add <your-github-username>/claude-equity-research-skill
-/plugin install equity-research@manish-equity-research
+/plugin marketplace add gmanish10/equity-research-skill
+/plugin install equity-research@comprehensive-equity-research
 ```
 
 After install, restart Claude Code to pick up the new slash commands.
 
+## Install on Codex
+
+This repo also includes Codex plugin metadata:
+
+- `.codex-plugin/plugin.json` — plugin manifest
+- `.agents/plugins/marketplace.json` — Codex marketplace manifest
+- `skills/equity-research/SKILL.md` — skill entry point
+- `commands/*.md` — slash-command prompts
+
+Add the marketplace from Codex CLI:
+
+```bash
+codex plugin marketplace add gmanish10/equity-research-skill
+```
+
+Then enable the plugin in the Codex plugin UI. If you are installing manually, add this stanza to `~/.codex/config.toml` after adding the marketplace:
+
+```toml
+[plugins."equity-research@comprehensive-equity-research"]
+enabled = true
+```
+
+Restart Codex or open a fresh session after enabling the plugin.
+
 ### Prerequisites
 
-- Claude Code with plugins enabled
+- Claude Code or Codex with plugins enabled
 - [Yahoo Finance MCP](https://github.com/yahoofinance-mcp) server configured
-- Python 3.10+ on the machine running Claude Code
+- Python 3.10+ on the machine running Claude Code or Codex
 - Python packages: `pandas numpy openpyxl rapidfuzz yfinance python-docx`
 
   ```bash
   pip install pandas numpy openpyxl rapidfuzz yfinance python-docx
   ```
 
-## Install as a standalone skill (Cowork / Claude.ai)
+## Install as a standalone skill
 
-If you're not using Claude Code, you can install just the skill (without the slash commands) by downloading the `.skill` release asset, dragging it into a Cowork chat, and clicking **Save skill**.
+If you're not using a plugin-capable client, you can install just the skill (without the slash commands) by packaging or copying `skills/equity-research/` into your client's skill location. In clients that support `.skill` files, use the release asset if one is published.
 
 ## Usage
 
@@ -69,10 +93,15 @@ Or just ask naturally — the skill's description triggers automatically on inve
 ## Directory structure
 
 ```
-claude-equity-research-skill/
+equity-research-skill/
+|-- .agents/
+|   \-- plugins/
+|       \-- marketplace.json           # Codex marketplace manifest
 |-- .claude-plugin/
 |   |-- marketplace.json               # Plugin marketplace manifest
-|   \-- plugin.json                    # Plugin manifest
+|   \-- plugin.json                    # Claude plugin manifest
+|-- .codex-plugin/
+|   \-- plugin.json                    # Codex plugin manifest
 |-- commands/                          # Slash commands (plugin root)
 |   |-- research-stock.md
 |   |-- analyze-portfolio.md

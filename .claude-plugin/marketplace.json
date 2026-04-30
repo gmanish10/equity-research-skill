@@ -1,10 +1,11 @@
 {
   "name": "comprehensive-equity-research",
   "owner": {
-    "name": "Manish"
+    "name": "Manish",
+    "url": "https://github.com/gmanish10"
   },
   "metadata": {
-    "description": "Aggressive-growth equity research plugin for Claude Code, built on the Yahoo Finance MCP",
+    "description": "Aggressive-growth equity research plugin for Claude Code and Codex, built on the Yahoo Finance MCP",
     "version": "0.1.0"
   },
   "plugins": [

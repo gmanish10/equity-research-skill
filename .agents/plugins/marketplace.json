@@ -1,0 +1,20 @@
+{
+  "name": "comprehensive-equity-research",
+  "interface": {
+    "displayName": "Comprehensive Equity Research"
+  },
+  "plugins": [
+    {
+      "name": "equity-research",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Finance"
+    }
+  ]
+}
