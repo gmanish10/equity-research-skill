@@ -70,7 +70,7 @@ Recommendations follow from the **reconciled** action set (Step 3.5), not the ra
 Structured action list:
 - **REDUCE / REMOVE** — per position, reason + quantified risk if kept
 - **KEEP** — per position, restated thesis
-- **ADD** — tickers/ETFs with sizing, role, thesis
+- **ADD** — tickers/ETFs with sizing, role, thesis. To fill a gap the book can't cover from existing holdings, **generate new candidates via a live screen** (SKILL.md → Section 5, "Idea generation") — `screen_stocks` + sector/industry data → shortlist → subagent mini deep-dive. Never pull new names from memory. Prefer ETF equivalents over mutual funds for new money.
 - **CONDITIONAL TRIGGERS** — every action gated on price / technical / fundamental / macro
 - **TIMELINE** — immediate / 2–4 weeks / pending catalyst
 - **HEDGES** — if concentration warrants

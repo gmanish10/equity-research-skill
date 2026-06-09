@@ -21,6 +21,10 @@ Extract the target tilt from `$ARGUMENTS`. Common cases:
 - "defensive" — raise cash, add hedges (unusual given the skill's default mandate)
 - No argument — general optimization under the default aggressive-growth mandate
 
+### 1b. Source new candidates for any "add exposure" tilt
+
+When the tilt calls for exposure the current book can't supply (new theme, sector, factor, hedge, income sleeve), **don't pull names from memory** — run the idea-generation flow (SKILL.md → Section 5): `screen_stocks` + `get_sector_data`/`get_industry_data` against the gap → filter out names redundant with existing holdings → shortlist → subagent mini deep-dive → rank. Prefer ETF equivalents over mutual funds for new money. Every new candidate enters the matrix held to the quality bar.
+
 ### 2. Build the action matrix
 
 For each action, specify all five fields:

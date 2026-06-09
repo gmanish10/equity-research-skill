@@ -12,6 +12,7 @@ A Claude Code plugin for opinionated, aggressive-growth equity research — stoc
 - **Sector briefs** — composition, aggregates, regime fit, best-in-class names, entry vehicles.
 - **Options flow** — IV rank, skew, put/call ratios, max pain, magnet strikes, implied moves, unusual activity.
 - **Rebalance plans** — concrete action matrices with triggers, deadlines, and risk callouts per line.
+- **Idea generation** — screens live market data for *new* stocks, ETFs, or options overlays to fill a mandate or a gap in your book — candidates are sourced from a screen and run through a real workup, never pulled from memory.
 
 ## The framing
 
@@ -57,6 +58,7 @@ Slash commands exposed by the plugin:
 | `/sector-brief SECTOR` | Sector analysis + best-in-class picks |
 | `/options-flow TICKER` | Options setup read |
 | `/rebalance-plan` | Action matrix after a portfolio review |
+| `/find-ideas MANDATE` | Screen live data for new buy ideas (stocks, ETFs, overlays) |
 
 Or just ask naturally — the skill's description triggers automatically on investment-related queries:
 
@@ -64,6 +66,7 @@ Or just ask naturally — the skill's description triggers automatically on inve
 - "Here's my portfolio (attaches file). Review it with an aggressive growth lens."
 - "What's the options setup on TSLA for next month?"
 - "Give me a sector brief on semiconductors."
+- "Find me some new AI-exposure ideas that aren't already in my portfolio."
 - "Based on the review, what should I actually do this week?"
 
 ## Directory structure
@@ -82,7 +85,8 @@ equity-research-skill/
 |       |   |-- analyze-etf.md
 |       |   |-- sector-brief.md
 |       |   |-- options-flow.md
-|       |   \-- rebalance-plan.md
+|       |   |-- rebalance-plan.md
+|       |   \-- find-ideas.md
 |       \-- skills/
 |           \-- equity-research/       # The skill
 |               |-- SKILL.md           # Skill entry point

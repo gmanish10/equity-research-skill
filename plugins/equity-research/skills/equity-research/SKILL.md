@@ -4,8 +4,9 @@ description: >
   Equity research and portfolio analysis for US markets (NYSE/NASDAQ) plus crypto (`BTC-USD`-style
   tickers), international ADRs, REITs, and fixed-income ETFs — built on the Yahoo Finance MCP plus
   web/social. Use for any stock, ETF, sector, options, watchlist, or portfolio question — deep dives,
-  portfolio reviews, sector briefings, options flow, rebalancing — including casual asks like
-  "how's NVDA looking" or "should I trim MSFT". Risk lens is configurable (aggressive / balanced /
+  portfolio reviews, sector briefings, options flow, rebalancing, and screening for new buy ideas —
+  including casual asks like "how's NVDA looking", "should I trim MSFT", or "what should I buy for AI
+  exposure". Risk lens is configurable (aggressive / balanced /
   conservative); defaults to aggressive-growth when unspecified. Produces opinionated short/mid/
   long-term ratings with explicit, quantified risk callouts. Intakes portfolios from Excel, CSV,
   screenshots, broker PDFs, or typed text.
@@ -52,6 +53,8 @@ Phases 1–6 are lens-neutral — they're just research. Phase 7 ratings, positi
 
 Framework is tuned for US equities + ETFs. Yahoo Finance also covers crypto (`BTC-USD`, `ETH-USD`, etc.), international ADRs, REITs, and fixed-income ETFs — these work, but some phases compress or substitute (on-chain metrics for crypto, FFO instead of EPS for REITs, duration/OAS for bond ETFs, FX + geopolitical risk for international). See `references/asset-classes.md` for per-asset-class adaptations before running a deep dive on non-US-equity.
 
+**Mutual funds:** analyze them if the user already holds them — Yahoo provides expense ratio, holdings, and returns. But for **new money, recommend the ETF equivalent**, not a mutual fund: lower cost, intraday liquidity, and better tax treatment, which matter even more under the aggressive lens. Say why when you substitute. Don't propose mutual funds as new adds.
+
 Explicitly unsupported: individual bonds (CUSIP-level), commodity futures rolling contracts, private companies / pre-merger SPACs, OTC pinks without Yahoo data. Say so rather than fake it.
 
 ---
@@ -62,6 +65,7 @@ Explicitly unsupported: individual bonds (CUSIP-level), commodity futures rollin
 2. **Portfolio analysis** — multi-format intake + per-position research + gated recs
 3. **ETF analysis** — holdings, methodology, factor exposure, role fit
 4. **Sector / market briefing** — macro, rotation, catalysts
+5. **Idea generation** — screen live data for *new* candidates to add (stocks, ETFs, options overlays)
 
 ---
 
@@ -295,7 +299,7 @@ Recommendations follow from the **reconciled** action set (Step 3.5), not the ra
 Frame as actions with conditions, not hopes:
 - **Reduce / Remove** — ticker, reason, quantified risk if kept
 - **Keep** — ticker, restated thesis
-- **Add** — ticker/ETF, sizing (must respect lens caps), role, thesis
+- **Add** — ticker/ETF, sizing (must respect lens caps), role, thesis. For a gap the current book can't fill from existing holdings, **generate new candidates via a live screen** — see Section 5, "Idea generation". Don't pull new names from memory.
 - **Conditional triggers** — every rec gated on price / technical / fundamental / macro condition
   - e.g. "Add to NVDA on pullback to 50-DMA with RSI < 45"
 - **Timelines** — immediate / next 2–4 weeks / pending catalyst
@@ -340,6 +344,22 @@ Follow `references/sector-analysis.md`:
 - Calendar (`get_market_calendar`)
 - Portfolio impact if a book is shared
 - What to watch (levels, catalysts, narrative risks)
+
+---
+
+## 5. Idea generation — new candidates from a live screen
+
+This is the "what should I buy?" capability — surfacing **new** names and vehicles, not just rating what the user already holds. Triggers: a portfolio review / rebalance that identifies a gap to fill, or a standalone request (`/find-ideas`, "give me growth ideas", "what should I add for AI exposure").
+
+**Candidates come from a live screen, never from memory.** A name the model simply recalls is not a sourced idea — it fails the quality bar. Pull the longlist from the tools:
+
+1. **Define the mandate → screen criteria.** Translate the objective into explicit filters bounded by the lens caps: the missing sector/factor/theme, a hedge need, a higher-beta sleeve, income, etc. State the criteria so the result is reproducible.
+2. **Screen, don't recall.** Build the candidate longlist from `screen_stocks` (sector, market cap, growth, margin, momentum, valuation filters) and `get_sector_data` / `get_industry_data` (sector/industry leaders and top ETFs for the role). For an ETF mandate, screen ETFs by role/methodology, not just the first ticker that comes to mind.
+3. **Filter against the book (if one exists).** Drop candidates redundant with or highly correlated to current holdings — a new idea must add an exposure the book lacks. Use the base-pass correlation context. For new money where a fund would be the vehicle, substitute the **ETF equivalent** over a mutual fund (see Asset-class scope).
+4. **Shortlist → mini deep-dive via subagents.** Take the top ~3–5 survivors and dispatch **one Task subagent per candidate** running the 7-phase framework (compact verdict acceptable), returning only its verdict. Memory-sourced names that don't survive a real workup are dropped.
+5. **Rank and recommend.** Present the survivors with the full quality-bar verdict — sizing within lens caps, the **role/gap each fills**, what it adds that the book lacks, what kills it, and conviction. Tie every idea to the gap or mandate that motivated it.
+
+Candidates are recommendations: every one clears the **Recommendation quality bar** and is **gated in plan mode** before it ships. Cite the screen criteria and the live metrics behind each pick — "screened for >20% rev growth + <40 fwd P/E in software, survived workup," not "XYZ is a great company."
 
 ---
 
