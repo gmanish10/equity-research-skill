@@ -2,7 +2,7 @@
 
 > **Disclaimer — read this first.** This plugin produces opinionated investment analysis for educational and informational purposes only. It is **not personalized financial advice**. Nothing produced by this plugin should be taken as a recommendation to buy, sell, or hold any security. Data is delayed ~15 minutes. Consult a qualified financial advisor before making investment decisions. Past performance does not predict future returns. Options involve substantial risk and can expire worthless. Leveraged ETFs are not long-term investments. You can lose money. Use at your own risk.
 
-A Claude Code and Codex plugin for opinionated, aggressive-growth equity research — stocks, options, ETFs, sectors, and full portfolio reviews. Uses the Yahoo Finance MCP for quantitative data and web search for qualitative context.
+A Claude Code plugin for opinionated, aggressive-growth equity research — stocks, options, ETFs, sectors, and full portfolio reviews. Uses the Yahoo Finance MCP for quantitative data and web search for qualitative context.
 
 ## What it does
 
@@ -30,35 +30,11 @@ This repo includes Claude Code plugin marketplace metadata. Install it with two 
 
 After install, restart Claude Code to pick up the new slash commands.
 
-## Install on Codex
-
-This repo also includes Codex plugin metadata:
-
-- `.agents/plugins/marketplace.json` — Codex marketplace manifest
-- `plugins/equity-research/.codex-plugin/plugin.json` — plugin manifest
-- `plugins/equity-research/skills/equity-research/SKILL.md` — skill entry point
-- `plugins/equity-research/commands/*.md` — slash-command prompts
-
-Add the marketplace from Codex CLI:
-
-```bash
-codex plugin marketplace add gmanish10/equity-research-skill
-```
-
-Then enable the plugin in the Codex plugin UI. If you are installing manually, add this stanza to `~/.codex/config.toml` after adding the marketplace:
-
-```toml
-[plugins."equity-research@comprehensive-equity-research"]
-enabled = true
-```
-
-Restart Codex or open a fresh session after enabling the plugin.
-
 ### Prerequisites
 
-- Claude Code or Codex with plugins enabled
+- Claude Code with plugins enabled
 - [Yahoo Finance MCP](https://github.com/yahoofinance-mcp) server configured
-- Python 3.10+ on the machine running Claude Code or Codex
+- Python 3.10+ on the machine running Claude Code
 - Python packages: `pandas numpy openpyxl rapidfuzz yfinance python-docx`
 
   ```bash
@@ -94,17 +70,12 @@ Or just ask naturally — the skill's description triggers automatically on inve
 
 ```
 equity-research-skill/
-|-- .agents/
-|   \-- plugins/
-|       \-- marketplace.json           # Codex marketplace manifest
 |-- .claude-plugin/
 |   \-- marketplace.json               # Claude Code marketplace manifest
 |-- plugins/
 |   \-- equity-research/               # Plugin root
 |       |-- .claude-plugin/
 |       |   \-- plugin.json            # Claude plugin manifest
-|       |-- .codex-plugin/
-|       |   \-- plugin.json            # Codex plugin manifest
 |       |-- commands/                  # Slash commands
 |       |   |-- research-stock.md
 |       |   |-- analyze-portfolio.md

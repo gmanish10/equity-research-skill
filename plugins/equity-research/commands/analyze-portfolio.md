@@ -23,21 +23,22 @@ Normalize to `{ ticker, shares, avg_cost?, cost_basis_date?, account?, notes? }`
 
 **Always confirm the parsed portfolio as a table** before analysis. Ask: "Does this look right?"
 
-### Step 1 — Progressive-depth research (see SKILL.md for full rules)
+### Step 1 — Per-position deep dive via subagents (see SKILL.md for full rules)
 
-Three-pass escalation — no hard caps on position depth:
+**Every position gets the full 7-phase deep dive. No shallow tier, no top-holdings shortcut.** Each holding is researched to the same depth as a standalone `/research-stock` call. Subagents make this affordable.
 
-- **Pass A (whole book, 2 batch calls)**: `get_tickers_info([all])` + `download([all, SPY, sectors], 1y, 1wk)`. Pipe `download()` output to `scripts/portfolio_metrics.py`; consume only the summary — do NOT inline raw OHLCV.
-- **Pass B (every position, parallelized)**: `get_analyst_data(recommendations + price_targets)` for all tickers. For positions ≥3% of book, also pull yearly financials, earnings, `eps_trend`, and `institutional + insider_purchases` holders.
-- **Pass C (flagged + top 5, full 7-phase)**: auto-escalate positions that trip any of these flags — broken thesis (price down >20% from avg cost, or 6m return >15% below sector), rich valuation (fwd P/E > 1.5× 5y median), weakening momentum (< 50-DMA + RSI < 45 + 3m negative), net analyst downgrades in last 90d, insider selling > $10M, fresh catalyst in last 30d, any position >10% of book, or explicit user callout. The top 5 positions by weight always auto-escalate.
+1. **Base pass (main thread, 2 batch calls):** `get_tickers_info([all])` + `download([all, SPY, sectors], 1y, 1wk)` → `scripts/portfolio_metrics.py`. Consume only the summary — do NOT inline raw OHLCV. This is the cross-position view (correlation, weighted beta, weights) that individual subagents can't see; compute it first.
+2. **Per-position pass — one Task subagent per holding:** dispatch in parallel batches. Each subagent runs the **full 7-phase framework** on its ticker, obeys the token rules internally, and returns **only its 3-horizon verdict block**. Pass into each: ticker, shares/avg_cost, its **% weight**, the **lens**, any portfolio-level flag it trips, and a compact **"rest of the book"** line (other holdings + weights + sectors, plus this name's top correlation pairs) so its verdict is portfolio-aware, not blind to siblings. The main thread keeps only the verdicts + base-pass metrics — never the intermediate MCP payloads. These verdicts are **provisional** — reconcile them in Step 3.5.
 
-Non-Pass-C positions get the **compact 5-line verdict** (see SKILL.md → Phase 7 → "Compact verdict"), not the full 3-horizon template.
+**Flags are now for prioritization, not gating** — every position is deep-dived regardless. They decide which names lead the summary and get the hardest scrutiny: broken thesis (price down >20% from avg cost, or 6m return >15% below sector), rich valuation (fwd P/E > 1.5× 5y median), weakening momentum (< 50-DMA + RSI < 45 + 3m negative), net analyst downgrades in last 90d, insider selling > $10M, fresh catalyst in last 30d, any position >10% of book, or explicit user callout.
 
-Parallelize aggressively within each pass. No per-ticker serial loops.
+Note: the cost-basis flags only fire when intake carries `avg_cost`. Without it, lean on the sector-relative and momentum flags, and say which flags couldn't be evaluated.
+
+**Scale guardrail:** for books **>20 positions**, confirm before firing (N full deep dives is real time/token cost) and run subagents in batches. Never serialize per-ticker loops. Output defaults to the full 3-horizon verdict per position; offer the compact 5-line rendering (SKILL.md → "Compact verdict") for very large books if the full block ×N would be unreadable.
 
 ### Step 2 — Portfolio-level metrics
 
-Run `skills/equity-research/scripts/portfolio_metrics.py` against the Pass A `download()` output. Consume only the summary — never hand raw OHLCV to the model. Produces:
+Run `skills/equity-research/scripts/portfolio_metrics.py` against the base-pass `download()` output. Consume only the summary — never hand raw OHLCV to the model. Produces:
 - Weights, sector/geo/mcap breakdown
 - Weighted beta
 - Correlation matrix (from 1y weekly)
@@ -52,7 +53,19 @@ See `skills/equity-research/references/portfolio-construction.md`. Identify:
 - Concentration risks AND concentration opportunities
 - Gaps costing upside
 
+### Step 3.5 — Reconciliation (mandatory)
+
+The N per-position verdicts are provisional and were formed in isolation. Reconcile them into one coherent book before recommending anything (see SKILL.md → Step 3.5):
+- **Summed sizing must close** — all "Add" targets + holds ≤ 100% / available cash, and no name/sector breaches the lens cap once adds land. Targets yield if they don't.
+- **Correlation clusters** — two correlated "Add"s are one bet sized twice; keep the higher-conviction expression, trim/hold the other.
+- **Redundancy** — collapse duplicate exposures (same theme/driver, or an ETF that already holds a single-name position).
+- **Factor/beta coherence** — check the reconciled set against base-pass weighted beta and factor tilts; rein in drift past the lens tolerance.
+
+Where a reconciled action differs from a standalone verdict, say so and why.
+
 ### Step 4 — Recommendations
+
+Recommendations follow from the **reconciled** action set (Step 3.5), not the raw verdicts. Every line must clear the **Recommendation quality bar** in SKILL.md (falsifiable, quantified downside, sized, time-boxed, opportunity-cost aware, conviction-tagged). **Gate the action set in plan mode** — present it for approval before committing it to the `.docx`.
 
 Structured action list:
 - **REDUCE / REMOVE** — per position, reason + quantified risk if kept

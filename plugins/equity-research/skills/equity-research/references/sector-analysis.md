@@ -8,6 +8,8 @@ Technology, Healthcare, Financials, Consumer Discretionary, Communication Servic
 
 Each has its own valuation norms, cyclicality, and macro sensitivity. Don't apply technology norms to utilities.
 
+> Macro inputs (Fed, CPI, yields, oil, GDP) follow SKILL.md → "News & macro sourcing": pull from free primary sources (FOMC, BLS, BEA, Treasury, EIA), date-stamp them, and treat anything older than ~30 days as potentially stale.
+
 ## Data to pull
 
 ```

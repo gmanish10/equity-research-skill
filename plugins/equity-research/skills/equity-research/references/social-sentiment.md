@@ -4,6 +4,8 @@ Goal: read the crowd. Sentiment rarely predicts returns alone, but divergence be
 
 ## Data sources (web search required)
 
+> Follow the tiered free-source list, paywall handling, and recency/cross-check rules in SKILL.md → "News & macro sourcing". The social platforms below are **Tier 3 — sentiment signal, not fact**: they establish what the crowd believes, never what is true. Confirm any market-moving claim against a Tier 1/2 primary source before it drives a rating.
+
 ### News sources
 - **Yahoo Finance news**: `get_ticker_calendar(symbol, "news")` — first stop, MCP-sourced
 - **SEC filings**: `get_ticker_calendar(symbol, "sec_filings")` — primary-source catalysts

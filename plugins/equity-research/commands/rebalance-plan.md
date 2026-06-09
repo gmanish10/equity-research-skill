@@ -55,11 +55,15 @@ Sequence the actions logically:
 ...
 ```
 
+Every row must clear the **Recommendation quality bar** in SKILL.md — a `WHAT KILLS THIS` cell that just says "risk" fails it. Tag each row's conviction and say what each add beats (the position it displaces, SPY, or cash).
+
 ### 6. Post-plan summary
 
 Top 3 highest-conviction actions in plain English at the end, so the user has a TL;DR.
 
 ## Deliverable
+
+These are trade instructions, so **present the matrix in plan mode for approval before finalizing** — the user signs off on the set of trades before you write any document.
 
 Chat response by default. Offer to write a .docx if the plan has >6 actions or involves complex conditionality.
 

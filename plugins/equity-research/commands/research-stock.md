@@ -31,3 +31,4 @@ Run the 7-phase framework on `$ARGUMENTS` and produce multi-horizon ratings.
 - Compute ratios yourself from MCP data.
 - When data is stale, say so.
 - When you don't know, say you don't know.
+- Every horizon's rating clears the **Recommendation quality bar** in SKILL.md — conviction-tagged, opportunity-cost aware, and falsifiable. Anchor on forward risk/reward, not on the user's cost basis.
