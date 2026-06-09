@@ -299,7 +299,7 @@ Recommendations follow from the **reconciled** action set (Step 3.5), not the ra
 Frame as actions with conditions, not hopes:
 - **Reduce / Remove** — ticker, reason, quantified risk if kept
 - **Keep** — ticker, restated thesis
-- **Add** — ticker/ETF, sizing (must respect lens caps), role, thesis. For a gap the current book can't fill from existing holdings, **generate new candidates via a live screen** — see Section 5, "Idea generation". Don't pull new names from memory.
+- **Add** — ticker/ETF, sizing (must respect lens caps), role, thesis. **Always run an idea-generation pass on every portfolio review** (Section 5, "Idea generation"), not only when a gap is flagged: screen live data and surface the **top 2–3 new candidates that would most improve the book** — fill an identified gap if there is one, otherwise the best risk-adjusted upgrades to current positioning. Present them as optional adds even when the book is already sound; if nothing clears the quality bar, say "screened, nothing compelling" rather than forcing a pick. New names come from a live screen, never from memory.
 - **Conditional triggers** — every rec gated on price / technical / fundamental / macro condition
   - e.g. "Add to NVDA on pullback to 50-DMA with RSI < 45"
 - **Timelines** — immediate / next 2–4 weeks / pending catalyst
